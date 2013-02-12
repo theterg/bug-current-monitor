@@ -171,6 +171,17 @@ public class CurrentMonitorServiceApplication implements ManagedRunnable, Runnab
 			return;
 		}
 		
+		//Let the ADC settle...
+		try {
+			for (int i=0;i<5;i++){
+				readADC();
+			}
+		} catch (IOException e) {
+			
+		} catch (InterruptedException e) { 
+			running = false;
+		}
+		
 		while(running){
 			try {
 				lastReading = readADC();	//readADC takes 200ms to complete
