@@ -27,6 +27,8 @@ public class Activator implements BundleActivator {
 		LogService.class.getName(),
 	};	
 	private ServiceTracker serviceTracker;
+	private ServiceTracker serviceClients;
+	private CurrentMonitorServiceApplication app;
 	
 	/*
 	 * (non-Javadoc)
@@ -34,8 +36,11 @@ public class Activator implements BundleActivator {
 	 */
 	public void start(BundleContext context) throws Exception {
 		//Begin tracking services, and when all services are available, create thread and call ManagedRunnable.run().
-		serviceTracker = ServiceTrackerHelper.openServiceTracker(context, services, new CurrentMonitorServiceApplication());
-
+		serviceClients = new ServiceTracker(context, ICurrentMonitorNotification.class.getName(), null);
+		app = new CurrentMonitorServiceApplication(serviceClients);
+		//context.registerService(ICurrentMonitorService.class.getName(), app, null);
+		serviceTracker = ServiceTrackerHelper.openServiceTracker(context, services, app);
+		serviceClients.open();
 	}
 
     /*
@@ -46,6 +51,7 @@ public class Activator implements BundleActivator {
 	
 		//Will cause the ManagedRunnable.shutdown() to be called.
 		serviceTracker.close();
+		serviceClients.close();
 	}
 	
 	

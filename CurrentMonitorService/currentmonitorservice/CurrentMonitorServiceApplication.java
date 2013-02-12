@@ -13,6 +13,7 @@ import java.util.Map;
 
 import com.buglabs.bug.module.vonhippel.pub.IVonHippelModuleControl;
 import org.osgi.service.log.LogService;
+import org.osgi.util.tracker.ServiceTracker;
 
 import com.buglabs.application.ServiceTrackerHelper.ManagedRunnable;
 /**
@@ -30,6 +31,7 @@ public class CurrentMonitorServiceApplication implements ManagedRunnable, Runnab
 	IVonHippelModuleControl vh;
 	Thread myThread;
 	CurrentMonitorConfig cfg;
+	ServiceTracker clients;
 	
 	boolean running = true;
 	boolean buttonActive = false;
@@ -40,6 +42,10 @@ public class CurrentMonitorServiceApplication implements ManagedRunnable, Runnab
 	public int avgReading;
 	public int minReading;
 	public int maxReading;
+	
+	public CurrentMonitorServiceApplication(ServiceTracker tracker){
+		clients = tracker;
+	}
 
 	@Override
 	//this is executed when the service is started
@@ -158,6 +164,20 @@ public class CurrentMonitorServiceApplication implements ManagedRunnable, Runnab
 		Thread.sleep(200);
 		return ((reading - 0x800000) >> 6);
 	}
+	
+	private void alert(boolean turningOn){
+		if (turningOn){
+			ilog("DEVICE TURNED ON");
+		} else {
+			ilog("DEVICE TURNED OFF");
+		}
+		Object[] services = clients.getServices();
+		if (services != null) {
+			for (Object s: services) {
+				((ICurrentMonitorNotification) s).thresholdCrossed(turningOn);
+			}
+		}
+	}
 
 	@Override
 	public void run() {
@@ -192,11 +212,11 @@ public class CurrentMonitorServiceApplication implements ManagedRunnable, Runnab
 					zero();
 				}
 				if (!on && (avgReading > cfg.getThresh())){
-					ilog("DEVICE TURNED ON");
+					alert(true);
 					on = true;
 				} 
 				if (on && (avgReading < cfg.getThresh())) {
-					ilog("DEVICE TURNED OFF");
+					alert(false);
 					on = false;
 				}
 				//Preform this every second.

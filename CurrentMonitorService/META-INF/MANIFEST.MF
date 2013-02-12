@@ -14,3 +14,4 @@ Import-Package: org.osgi.framework,
  org.osgi.util.tracker,
  com.buglabs.application,
  com.buglabs.util
+Export-Package: currentmonitorservice
