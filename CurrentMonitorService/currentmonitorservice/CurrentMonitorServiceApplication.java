@@ -166,11 +166,15 @@ public class CurrentMonitorServiceApplication implements ManagedRunnable, Runnab
 	}
 	
 	private void alert(boolean turningOn){
-		if (turningOn){
-			ilog("DEVICE TURNED ON");
-		} else {
-			ilog("DEVICE TURNED OFF");
-		}
+		try {
+			if (turningOn){
+				ilog("DEVICE TURNED ON");
+				vh.setIOX(0);
+			} else {
+				ilog("DEVICE TURNED OFF");
+				vh.clearIOX(0);
+			}
+		} catch (IOException e) {}
 		Object[] services = clients.getServices();
 		if (services != null) {
 			for (Object s: services) {
