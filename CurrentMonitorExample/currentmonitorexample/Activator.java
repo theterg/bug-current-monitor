@@ -13,6 +13,7 @@ import org.osgi.util.tracker.ServiceTracker;
 import com.buglabs.application.ServiceTrackerHelper;
 
 import currentmonitorservice.ICurrentMonitorNotification;
+import currentmonitorservice.ICurrentMonitorService;
 
 
 /**
@@ -25,6 +26,7 @@ public class Activator implements BundleActivator {
 	 */
 	private static final String [] services = {		
 		LogService.class.getName(),
+		ICurrentMonitorService.class.getName(),
 	};	
 	private ServiceTracker serviceTracker;
 	private CurrentMonitorExampleApplication app;

@@ -38,7 +38,7 @@ public class Activator implements BundleActivator {
 		//Begin tracking services, and when all services are available, create thread and call ManagedRunnable.run().
 		serviceClients = new ServiceTracker(context, ICurrentMonitorNotification.class.getName(), null);
 		app = new CurrentMonitorServiceApplication(serviceClients);
-		//context.registerService(ICurrentMonitorService.class.getName(), app, null);
+		context.registerService(ICurrentMonitorService.class.getName(), app, null);
 		serviceTracker = ServiceTrackerHelper.openServiceTracker(context, services, app);
 		serviceClients.open();
 	}

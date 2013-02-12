@@ -7,6 +7,7 @@ import org.osgi.service.log.LogService;
 import com.buglabs.application.ServiceTrackerHelper.ManagedRunnable;
 
 import currentmonitorservice.ICurrentMonitorNotification;
+import currentmonitorservice.ICurrentMonitorService;
 /**
  * This class represents the running application when all service dependencies are fulfilled.
  * 
@@ -19,11 +20,27 @@ import currentmonitorservice.ICurrentMonitorNotification;
  */
 public class CurrentMonitorExampleApplication implements ManagedRunnable, ICurrentMonitorNotification {
 	LogService ls;
+	ICurrentMonitorService mon;
 
 	@Override
 	public void run(Map<Object, Object> services) {			
 		ls = (LogService) services.get(LogService.class.getName());
+		mon = (ICurrentMonitorService) services.get(ICurrentMonitorService.class.getName());
 		ilog("Start");
+		try {
+			ilog("Last Reading was: "+mon.getLastReading());
+			ilog("Average reading is: "+mon.getLastAvgReading());
+			ilog("Current threshold is "+mon.getThresh()+" with multiplier "+mon.getThresholdMultiplier());
+			ilog("Decreasing the sensitivity");
+			mon.setThresh(mon.getThresh()-1000);
+			ilog("New threshold is "+mon.getThresh()+" with multiplier "+mon.getThresholdMultiplier());
+			Thread.sleep(2000);
+			ilog("Re-zeroing the current monitor now");
+			mon.calibrateZero();
+			ilog("New threshold is "+mon.getThresh()+" with multiplier "+mon.getThresholdMultiplier());
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override

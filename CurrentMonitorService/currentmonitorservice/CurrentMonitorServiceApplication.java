@@ -26,7 +26,7 @@ import com.buglabs.application.ServiceTrackerHelper.ManagedRunnable;
  * By default, the application will only be started when all service dependencies are fulfilled.  For 
  * finer grained service binding logic, see ServiceTrackerHelper.openServiceTracker(BundleContext context, String[] services, Filter filter, ServiceTrackerCustomizer customizer)
  */
-public class CurrentMonitorServiceApplication implements ManagedRunnable, Runnable {
+public class CurrentMonitorServiceApplication implements ManagedRunnable, Runnable, ICurrentMonitorService {
 	LogService ls;
 	IVonHippelModuleControl vh;
 	Thread myThread;
@@ -237,10 +237,45 @@ public class CurrentMonitorServiceApplication implements ManagedRunnable, Runnab
 			}
 		}
 	}
+
+	@Override
+	public void calibrateZero() {
+		zero();
+	}
+
+	@Override
+	public void setThresh(int threshold) {
+		cfg.setThresh(threshold);
+	}
+
+	@Override
+	public int getThresh() {
+		return cfg.getThresh();
+	}
+
+	@Override
+	public void setThresholdMultiplier(int threshold_multiplier) {
+		cfg.setThresholdMultiplier(threshold_multiplier);
+	}
+
+	@Override
+	public int getThresholdMultiplier() {
+		return cfg.getThresholdMultiplier();
+	}
+
+	@Override
+	public int getLastAvgReading() {
+		return avgReading;
+	}
+
+	@Override
+	public int getLastReading() {
+		return lastReading;
+	}
 	
 	//Wrappers for the log service (to standardize logged messages)
-	void ilog(String message){  ls.log(LogService.LOG_INFO, "["+this.getClass().getPackage().getName()+"] "+message);	}
-	void dlog(String message){  ls.log(LogService.LOG_DEBUG, "["+this.getClass().getPackage().getName()+"] "+message);	}
-	void elog(String message){  ls.log(LogService.LOG_ERROR, "["+this.getClass().getPackage().getName()+"] "+message);	}
-	void wlog(String message){  ls.log(LogService.LOG_WARNING, "["+this.getClass().getPackage().getName()+"] "+message);	}
+		void ilog(String message){  ls.log(LogService.LOG_INFO, "["+this.getClass().getPackage().getName()+"] "+message);	}
+		void dlog(String message){  ls.log(LogService.LOG_DEBUG, "["+this.getClass().getPackage().getName()+"] "+message);	}
+		void elog(String message){  ls.log(LogService.LOG_ERROR, "["+this.getClass().getPackage().getName()+"] "+message);	}
+		void wlog(String message){  ls.log(LogService.LOG_WARNING, "["+this.getClass().getPackage().getName()+"] "+message);	}
 }
