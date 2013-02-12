@@ -1,6 +1,11 @@
 package currentmonitorservice;
 
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,7 +29,7 @@ public class CurrentMonitorServiceApplication implements ManagedRunnable, Runnab
 	LogService ls;
 	IVonHippelModuleControl vh;
 	Thread myThread;
-	CurrentMonitorConfig cfg = new CurrentMonitorConfig();
+	CurrentMonitorConfig cfg;
 	
 	boolean running = true;
 	boolean buttonActive = false;
@@ -43,6 +48,8 @@ public class CurrentMonitorServiceApplication implements ManagedRunnable, Runnab
 		vh = (IVonHippelModuleControl) services.get(IVonHippelModuleControl.class.getName());
 		ls = (LogService) services.get(LogService.class.getName());
 		ilog("Start");
+		cfg = new CurrentMonitorConfig();
+		ilog("Using configuration values: "+cfg);
 		myThread = new Thread(this, this.getClass().getPackage().getName());
 		myThread.start();
 		//Execute the run() method below in a new thread.
@@ -138,9 +145,9 @@ public class CurrentMonitorServiceApplication implements ManagedRunnable, Runnab
 			elog("Interrupted during zero, cancelling");
 			return;
 		}
-		cfg.zeroPoint = avg;
-		cfg.thresh = avg + (max-min)*cfg.THRESHOLD_MULTIPLIER;
-		ilog("Results of zero: avg: "+avg+" P-P: "+(max-min)+" proposed thresh: "+cfg.thresh);
+		cfg.setZeroPoint(avg);
+		cfg.setThresh(avg + (max-min)*cfg.getThresholdMultiplier());
+		ilog("Results of zero: avg: "+avg+" P-P: "+(max-min)+" proposed thresh: "+cfg.getThresh());
 	}
 	
 	//Read from the ADC.  This assumes ADC was already enabled and CH0 selected
@@ -173,11 +180,11 @@ public class CurrentMonitorServiceApplication implements ManagedRunnable, Runnab
 					//Calibrate a new zero point
 					zero();
 				}
-				if (!on && (avgReading > cfg.thresh)){
+				if (!on && (avgReading > cfg.getThresh())){
 					ilog("DEVICE TURNED ON");
 					on = true;
 				} 
-				if (on && (avgReading < cfg.thresh)) {
+				if (on && (avgReading < cfg.getThresh())) {
 					ilog("DEVICE TURNED OFF");
 					on = false;
 				}
