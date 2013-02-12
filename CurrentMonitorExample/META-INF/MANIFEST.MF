@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: CurrentMonitorExample
+Bundle-Activator: currentmonitorexample.Activator
+Bundle-SymbolicName: CurrentMonitorExample
+Bundle-Version: 1.0.0
+Bundle-Vendor: theterg
+Bundle-Description: A demonstration of the CurrentMonitorService
+Bug-Bundle-Type: Application
+BUG-API-Version: 2.0.2
+Import-Package: com.buglabs.application,
+ com.buglabs.util,
+ currentmonitorservice,
+ org.osgi.framework,
+ org.osgi.service.log,
+ org.osgi.util.tracker
